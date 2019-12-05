@@ -4,15 +4,17 @@ Music players supporting USB drives and SD cards often only support the FAT file
 
 This utility copies music files (MP3 currently, FLAC and/or AAC can be added if there is demand) and can sort by:
 
-| option | description        |
-| ------ | -----------        |
-| track  | track id           |
-| artist | artist name        |
-| album  | album name         |
-| song   | song name          |
-| file   | file name          |
-| date   | last modified date |
-| random | random order       |
+| option | description             |
+| ------ | -----------             |
+| artist | artist name             |
+| album  | album name              |
+| song   | song name               |
+| track  | track id                |
+| genre  | song's genre            |
+| year   | year song was published |
+| file   | file name               |
+| date   | last modified date      |
+| random | random order            |
 
 Sort order is determined by (in order of precedence):
 

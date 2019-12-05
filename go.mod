@@ -5,4 +5,5 @@ go 1.13
 require (
 	github.com/dhowden/tag v0.0.0-20191122115059-7e5c04feccd8
 	github.com/stretchr/testify v1.4.0
+	github.com/wiggin77/cfg v1.0.2
 )
