@@ -23,6 +23,7 @@ const (
 
 type Entry struct {
 	filespec string
+	mode     os.FileMode
 	music    bool
 	fields   map[string]string
 }
@@ -34,6 +35,7 @@ func NewEntry(filespec string) (Entry, error) {
 		return Entry{}, err
 	}
 
+	entry.mode = fi.Mode()
 	entry.fields[FILENAME] = fi.Name()
 	entry.fields[LASTMODIFIED] = timeToString(fi.ModTime())
 	err = extractMeta(entry)

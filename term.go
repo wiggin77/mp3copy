@@ -9,6 +9,7 @@ import (
 
 const (
 	PROGRESS_BAR     = "********************"
+	PROGRESS_SPACE   = "                    "
 	PROGRESS_BAR_LEN = len(PROGRESS_BAR)
 )
 
@@ -42,15 +43,8 @@ func (t *Terminal) clearLine() {
 }
 
 func (t *Terminal) displayProgress() {
-	prog :=
-
-		t.sb.Reset()
-	for i := 0; i < PROGRESS_WIDTH; i++ {
-		if float32(i) <= PROGRESS_WIDTH*t.progress {
-			t.sb.WriteString("*")
-		} else {
-			t.sb.WriteString(" ")
-		}
-	}
-	fmt.Fprintf(os.Stdout, "\r[%s]%d%%", t.sb.String(), t.progress)
+	prog := int(float32(PROGRESS_BAR_LEN)*t.progress + 0.5)
+	bar := PROGRESS_BAR[:prog]
+	space := PROGRESS_SPACE[PROGRESS_BAR_LEN-prog:]
+	fmt.Fprintf(os.Stdout, "\r[%s%s]%d%%", bar, space, t.progress)
 }

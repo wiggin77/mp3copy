@@ -15,7 +15,7 @@ type Opts struct {
 func main() {
 	err := run()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%v\n", err)
+		Term.Errorf("%v\n", err)
 		os.Exit(-1)
 	}
 	os.Exit(0)
@@ -47,9 +47,9 @@ func run() error {
 		return fmt.Errorf("missing dest")
 	}
 
-	// check source exists
-	if _, err := os.Stat(opts.src); os.IsNotExist(err) {
-		return fmt.Errorf("src %s does not exist", opts.src)
+	// check source exists and is a directory
+	if fi, err := os.Stat(opts.src); err != nil || !fi.IsDir() {
+		return fmt.Errorf("src %s is not a directory", opts.src)
 	}
 
 	// check dest exists and is a directory

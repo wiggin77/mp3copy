@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -12,8 +13,7 @@ const (
 )
 
 func mp3copy(opts Opts) error {
-
-	return nil
+	return copyDir(opts, opts.src)
 }
 
 func copyDir(opts Opts, dir string) error {
@@ -21,10 +21,16 @@ func copyDir(opts Opts, dir string) error {
 	if err != nil {
 		return err
 	}
+	if !dirInfo.IsDir() {
+		return fmt.Errorf("not a directory: %s", dir)
+	}
 
 	var dirs []os.FileInfo
 	var entries []Entry
 	dirs, entries, err = getDirectoriesAndFiles(dir)
+	if err != nil {
+		return err
+	}
 
 	// calculate this directory relative to original source dir
 	reldir, err := filepath.Rel(opts.src, dir)
@@ -86,14 +92,47 @@ func getSorters(opts Opts, dir string) ([]Sorter, error) {
 }
 
 func copyFiles(opts Opts, entries []Entry) error {
+	buf := make([]byte, 64*1024)
 	for _, entry := range entries {
 		// calculate this file's directory relative to original source dir
 		reldir, err := filepath.Rel(opts.src, entry.filespec)
 		if err != nil {
 			return err
 		}
-
+		dest := filepath.Join(opts.dest, reldir)
+		err = copyFile(entry, dest, buf)
+		if err != nil {
+			Term.Errorf("%v", err)
+		}
 	}
+	return nil
+}
 
-	return fmt.Errorf("not implemented yet")
+func copyFile(entry Entry, dest string, buf []byte) error {
+	srcFile, err := os.Open(entry.filespec)
+	if err != nil {
+		return fmt.Errorf("cannot open %s: %v", entry.filespec, err)
+	}
+	defer srcFile.Close()
+
+	destFile, err := os.OpenFile(dest, os.O_CREATE|os.O_TRUNC, entry.mode)
+	if err != nil {
+		return fmt.Errorf("cannot create %s: %v", dest, err)
+	}
+	defer destFile.Close()
+
+	for {
+		n, err := srcFile.Read(buf)
+		if err != nil && err != io.EOF {
+			return fmt.Errorf("error reading from %s: %v", entry.filespec, err)
+		}
+		if n == 0 {
+			break
+		}
+
+		if _, err := destFile.Write(buf[:n]); err != nil {
+			return fmt.Errorf("error writing to %s: %v", dest, err)
+		}
+	}
+	return nil
 }
