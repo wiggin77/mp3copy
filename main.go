@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/mitchellh/go-homedir"
 )
 
 type Opts struct {
@@ -47,14 +49,25 @@ func run() error {
 		return fmt.Errorf("missing dest")
 	}
 
+	opts.src = expandTilde(opts.src)
+	opts.dest = expandTilde(opts.dest)
+
 	// check source exists and is a directory
 	if fi, err := os.Stat(opts.src); err != nil || !fi.IsDir() {
 		return fmt.Errorf("src %s is not a directory", opts.src)
 	}
 
 	// check dest exists and is a directory
-	if fi, err := os.Stat(opts.src); err != nil || !fi.IsDir() {
+	if fi, err := os.Stat(opts.dest); err != nil || !fi.IsDir() {
 		return fmt.Errorf("dest %s is not a directory", opts.dest)
 	}
 	return mp3copy(opts)
+}
+
+func expandTilde(s string) string {
+	t,err := homedir.Expand(s)
+	if err != nil {
+		t = s
+	}
+	return t
 }

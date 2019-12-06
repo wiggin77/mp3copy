@@ -2,6 +2,8 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dhowden/tag v0.0.0-20191122115059-7e5c04feccd8 h1:nmFnmD8VZXkjDHIb1Gnfz50cgzUvGN72zLjPRXBW/hU=
 github.com/dhowden/tag v0.0.0-20191122115059-7e5c04feccd8/go.mod h1:SniNVYuaD1jmdEEvi+7ywb1QFR7agjeTdGKyFb0p7Rw=
+github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=
+github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
@@ -11,7 +13,6 @@ github.com/wiggin77/cfg v1.0.2 h1:NBUX+iJRr+RTncTqTNvajHwzduqbhCQjEqxLHr6Fk7A=
 github.com/wiggin77/cfg v1.0.2/go.mod h1:b3gotba2e5bXTqTW48DwIFoLc+4lWKP7WPi/CdvZ4aE=
 github.com/wiggin77/merror v1.0.2 h1:V0nH9eFp64ASyaXC+pB5WpvBoCg7NUwvaCSKdzlcHqw=
 github.com/wiggin77/merror v1.0.2/go.mod h1:uQTcIU0Z6jRK4OwqganPYerzQxSFJ4GSHM3aurxxQpg=
-gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.2.2 h1:ZCJp+EgiOT7lHqUV2J862kp8Qj64Jo6az82+3Td9dZw=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=

@@ -25,16 +25,16 @@ type Terminal struct {
 }
 
 func (t *Terminal) Printf(format string, a ...interface{}) {
-	t.printf(os.Stdout, format, a)
+	t.printf(os.Stdout, format, a...)
 }
 
 func (t *Terminal) Errorf(format string, a ...interface{}) {
-	t.printf(os.Stderr, format, a)
+	t.printf(os.Stderr, format, a...)
 }
 
 func (t *Terminal) printf(w io.Writer, format string, a ...interface{}) {
 	t.clearLine()
-	fmt.Fprintf(os.Stdout, format, a)
+	fmt.Fprintf(os.Stdout, format, a...)
 	t.displayProgress()
 }
 
@@ -46,5 +46,5 @@ func (t *Terminal) displayProgress() {
 	prog := int(float32(PROGRESS_BAR_LEN)*t.progress + 0.5)
 	bar := PROGRESS_BAR[:prog]
 	space := PROGRESS_SPACE[PROGRESS_BAR_LEN-prog:]
-	fmt.Fprintf(os.Stdout, "\r[%s%s]%d%%", bar, space, t.progress)
+	fmt.Fprintf(os.Stdout, "\r[%s%s]%.1f%%", bar, space, t.progress)
 }

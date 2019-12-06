@@ -1,7 +1,9 @@
 package main
 
 import (
+	"math/rand"
 	"sort"
+	"time"
 )
 
 type Sorter struct {
@@ -17,8 +19,11 @@ func SortEntries(entries []Entry, sorters []Sorter) {
 	if len(sorters) == 0 {
 		return
 	}
-
 	sorter := sorters[0]
+	if sorter.field == RANDOM {
+		ShuffleEntries(entries)
+		return
+	}
 
 	sort.Slice(entries, func(i, j int) bool {
 		field1 := entries[i].fields[sorter.field]
@@ -57,5 +62,18 @@ func SortEntries(entries []Entry, sorters []Sorter) {
 			}
 		}
 		prev = val
+	}
+}
+
+// ShuffleEntries randomizes the order of entries in place.
+func ShuffleEntries(entries []Entry) {
+	r := rand.New(rand.NewSource(time.Now().Unix()))
+	size := len(entries)
+	var tmp Entry
+	for i := range entries {
+		j := r.Intn(size)
+		tmp = entries[i]
+		entries[i] = entries[j]
+		entries[j] = tmp
 	}
 }

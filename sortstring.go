@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	DEFAULT_SORT = "artist:a, album:a, track:a"
+	DEFAULT_SORT = "artist:a,album:a,track:a"
 )
 
 // GetSortString returns the sort string for the specified directory.
@@ -46,8 +46,13 @@ func GetSortString(opts Opts, dir string) string {
 			break
 		}
 	}
+	if opts.sort != "" {
+		msrc := cfg.NewSrcMapFromMap(map[string]string{"sort": opts.sort})
+		config.AppendSource(msrc)
+	}
+
 	s, _ := config.String("sort", DEFAULT_SORT)
-	return s
+	return strings.ReplaceAll(s, " ", "")
 }
 
 // ParseSortString parses a comma separated list of sort criteria of the form
