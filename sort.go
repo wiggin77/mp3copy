@@ -63,6 +63,9 @@ func SortEntries(entries []Entry, sorters []Sorter) {
 		}
 		prev = val
 	}
+	if found {
+		SortEntries(entries[start:], sorters[1:])
+	}
 }
 
 // ShuffleEntries randomizes the order of entries in place.

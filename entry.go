@@ -19,6 +19,8 @@ const (
 	YEAR         = "year"
 	RANDOM       = "random"
 	FIELD_COUNT  = 9
+
+	TIME_FORMAT = "2006-01-02T15:04:05.000"
 )
 
 type Entry struct {
@@ -71,7 +73,7 @@ func extractMeta(entry Entry) error {
 
 // timeToString converts a time.Time to a string that can be lexically sorted.
 func timeToString(t time.Time) string {
-	return t.Format("2006-01-02T15:04:05.000")
+	return t.Format(TIME_FORMAT)
 }
 
 // trackToString converts a track index to a string that can be lexically sorted.
