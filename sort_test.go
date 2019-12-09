@@ -40,7 +40,6 @@ func TestSortEntries(t *testing.T) {
 		args args
 	}
 	tests := []test{
-		// TODO: Add test cases.
 		{name: "case1", args: args{entries: genEntries(500), sorters: []Sorter{}}},
 		{name: "case2", args: args{entries: genEntries(500), sorters: []Sorter{
 			{field: FILENAME, descending: false},
