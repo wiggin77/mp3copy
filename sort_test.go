@@ -50,24 +50,24 @@ func TestSortEntries(t *testing.T) {
 			{field: ALBUM, descending: false},
 			{field: TRACK, descending: false},
 		}}},
+		{name: "case4", args: args{entries: genEntries(500), sorters: []Sorter{
+			{field: RANDOM, descending: false},
+		}}},
 	}
 	// Add some random test cases
-	/*
-		for i := 0; i < 500; i++ {
-			tests = append(tests, test{
-				name: "case_rnd" + strconv.Itoa(i),
-				args: args{
-					entries: genRandomEntries(500),
-					sorters: genRandomSorters(3),
-				},
-			})
-		}
-	*/
+	for i := 0; i < 500; i++ {
+		tests = append(tests, test{
+			name: "case_rnd" + strconv.Itoa(i),
+			args: args{
+				entries: genRandomEntries(500),
+				sorters: genRandomSorters(3),
+			},
+		})
+	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			SortEntries(tt.args.entries, tt.args.sorters)
-			t.Logf("%s, %v\n%v\n", tt.name, tt.args.sorters, tt.args.entries)
 			var b bool
 			if len(tt.args.sorters) > 0 && tt.args.sorters[0].field == RANDOM {
 				b = !isSorted(t, tt.args.entries, tt.args.sorters)
@@ -96,15 +96,20 @@ func isSorted(t *testing.T, entries []Entry, sorters []Sorter) bool {
 }
 
 func checkSorted(t *testing.T, entries []Entry, sorter Sorter) bool {
+	sortField := sorter.field
+	if sortField == RANDOM {
+		sortField = FILENAME
+	}
+
 	var prev, val string
 	var ok bool
 	for i, entry := range entries {
 		if i == 0 {
-			prev, ok = entry.fields[sorter.field]
-			require.Truef(t, ok, "missing field `%s`", sorter.field)
+			prev, ok = entry.fields[sortField]
+			require.Truef(t, ok, "missing field `%s`", sortField)
 			continue
 		}
-		val, ok = entry.fields[sorter.field]
+		val, ok = entry.fields[sortField]
 		require.True(t, ok)
 		if sorter.descending {
 			if val > prev {
@@ -240,4 +245,108 @@ func genRandomSorters(num int) []Sorter {
 		sorters = append(sorters, sorter)
 	}
 	return sorters
+}
+
+// TestIsSorted ensures that the testing helper method `isSorted` is correct.
+func TestIsSorted(t *testing.T) {
+	setup(t)
+	defer teardown(t)
+
+	type args struct {
+		entries []Entry
+		sorters []Sorter
+	}
+	type test struct {
+		name       string
+		wantSorted bool
+		args       args
+	}
+	tests := []test{
+		{name: "case1- artist unsorted, album unsorted, track unsorted", wantSorted: false, args: args{entries: []Entry{
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "3"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "1"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "4"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "2"}},
+
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "4"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "1"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "3"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "2"}},
+
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "3"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "1"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "4"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "2"}},
+		}, sorters: []Sorter{
+			{field: ARTIST, descending: false},
+			{field: ALBUM, descending: true},
+			{field: TRACK, descending: false},
+		}}},
+		{name: "case2 - artist sorted, album unsorted, track unsorted", wantSorted: false, args: args{entries: []Entry{
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "3"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "1"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "4"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "2"}},
+
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "3"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "1"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "4"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "2"}},
+
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "4"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "1"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "3"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "2"}},
+		}, sorters: []Sorter{
+			{field: ARTIST, descending: false},
+			{field: ALBUM, descending: true},
+			{field: TRACK, descending: false},
+		}}},
+		{name: "case3 - artist sorted, album sorted, track unsorted", wantSorted: false, args: args{entries: []Entry{
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "3"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "1"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "4"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "2"}},
+
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "4"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "1"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "3"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "2"}},
+
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "3"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "1"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "4"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "2"}},
+		}, sorters: []Sorter{
+			{field: ARTIST, descending: false},
+			{field: ALBUM, descending: true},
+			{field: TRACK, descending: false},
+		}}},
+		{name: "case4 - artist sorted, album sorted, track sorted", wantSorted: true, args: args{entries: []Entry{
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "4"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "3"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "2"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Led Zeppelin", ALBUM: "IV", TRACK: "1"}},
+
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "4"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "3"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "2"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Moving Pictures", TRACK: "1"}},
+
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "4"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "3"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "2"}},
+			{filespec: genRandomString(10), music: true, fields: map[string]string{ARTIST: "Rush", ALBUM: "Permanent Waves", TRACK: "1"}},
+		}, sorters: []Sorter{
+			{field: ARTIST, descending: false},
+			{field: ALBUM, descending: false},
+			{field: TRACK, descending: true},
+		}}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			sorted := isSorted(t, tt.args.entries, tt.args.sorters)
+			require.Equalf(t, tt.wantSorted, sorted, "%s - want %t, got %t", tt.name, tt.wantSorted, sorted)
+		})
+	}
 }
