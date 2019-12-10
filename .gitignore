@@ -29,3 +29,6 @@ app
 
 # builds
 mp3copy
+
+#test data
+testdata/dest
