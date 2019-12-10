@@ -55,7 +55,7 @@ func TestGetSortString(t *testing.T) {
 }
 
 func createOptsFile(srcDir string, sort string, children bool) (func() error, error) {
-	fn := filepath.Join(srcDir, ".mp3copy")
+	fn := filepath.Join(srcDir, OPTS_FILE)
 	file, err := os.Create(fn)
 	if err != nil {
 		return nil, err
