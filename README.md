@@ -37,3 +37,11 @@ sort = artist:a, album:a, track:a
 # that do not contain their own .mp3copy files
 children = true
 ```
+
+## Usage
+
+This example copies all music files (and artwork, etc) from src to dest.
+
+```bash
+./mp3copy -src=~/Music -dest=/media/usb_stick -sort=artist:a,album:a,track:a
+```
