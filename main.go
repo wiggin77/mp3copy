@@ -20,6 +20,7 @@ func main() {
 		Term.Errorf("%v\n", err)
 		os.Exit(-1)
 	}
+	Term.Printf("\n")
 	os.Exit(0)
 }
 
@@ -57,15 +58,17 @@ func run() error {
 		return fmt.Errorf("src %s is not a directory", opts.src)
 	}
 
-	// check dest exists and is a directory
+	// check dest exists and is a directory; create if needed
 	if fi, err := os.Stat(opts.dest); err != nil || !fi.IsDir() {
-		return fmt.Errorf("dest %s is not a directory", opts.dest)
+		if err := os.MkdirAll(opts.dest, fi.Mode().Perm()); err != nil {
+			return fmt.Errorf("dest %s is not a directory", opts.dest)
+		}
 	}
 	return mp3copy(opts)
 }
 
 func expandTilde(s string) string {
-	t,err := homedir.Expand(s)
+	t, err := homedir.Expand(s)
 	if err != nil {
 		t = s
 	}

@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	PROGRESS_BAR     = "********************"
-	PROGRESS_SPACE   = "                    "
+	PROGRESS_BAR     = "******************************"
+	PROGRESS_SPACE   = "                              "
 	PROGRESS_BAR_LEN = len(PROGRESS_BAR)
 )
 
@@ -32,6 +32,15 @@ func (t *Terminal) Errorf(format string, a ...interface{}) {
 	t.printf(os.Stderr, format, a...)
 }
 
+func (t *Terminal) Progress(current int64, total int64) {
+	if total == 0 {
+		t.progress = 0
+		return
+	}
+	t.progress = float32(current) / float32(total)
+	t.displayProgress()
+}
+
 func (t *Terminal) printf(w io.Writer, format string, a ...interface{}) {
 	t.clearLine()
 	fmt.Fprintf(os.Stdout, format, a...)
@@ -44,7 +53,9 @@ func (t *Terminal) clearLine() {
 
 func (t *Terminal) displayProgress() {
 	prog := int(float32(PROGRESS_BAR_LEN)*t.progress + 0.5)
-	bar := PROGRESS_BAR[:prog]
-	space := PROGRESS_SPACE[PROGRESS_BAR_LEN-prog:]
-	fmt.Fprintf(os.Stdout, "\r[%s%s]%.1f%%", bar, space, t.progress)
+	if prog > 0 {
+		bar := PROGRESS_BAR[:prog]
+		space := PROGRESS_SPACE[:PROGRESS_BAR_LEN-prog]
+		fmt.Fprintf(os.Stdout, "\r[%s%s] %.1f%%  ", bar, space, t.progress*100)
+	}
 }

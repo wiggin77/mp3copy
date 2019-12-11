@@ -49,7 +49,7 @@ func copyDir(opts Opts, dir string) error {
 
 	// copy child directories first
 	for _, d := range dirs {
-		child := filepath.Join(opts.dest, reldir, d.Name())
+		child := filepath.Join(opts.src, reldir, d.Name())
 		if err := copyDir(opts, child); err != nil {
 			return err
 		}
@@ -115,24 +115,31 @@ func copyFile(entry Entry, dest string, buf []byte) error {
 	}
 	defer srcFile.Close()
 
-	destFile, err := os.OpenFile(dest, os.O_CREATE|os.O_TRUNC, entry.mode)
+	destFile, err := os.OpenFile(dest, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, entry.mode)
 	if err != nil {
 		return fmt.Errorf("cannot create %s: %v", dest, err)
 	}
 	defer destFile.Close()
 
+	Term.Printf("%s\n", entry.filespec)
+
+	var count int64
+	var n int
 	for {
-		n, err := srcFile.Read(buf)
+		n, err = srcFile.Read(buf)
 		if err != nil && err != io.EOF {
-			return fmt.Errorf("error reading from %s: %v", entry.filespec, err)
+			return err
 		}
 		if n == 0 {
 			break
 		}
 
-		if _, err := destFile.Write(buf[:n]); err != nil {
-			return fmt.Errorf("error writing to %s: %v", dest, err)
+		if n, err = destFile.Write(buf[:n]); err != nil {
+			return err
 		}
+		count = count + int64(n)
+		Term.Progress(count, entry.size)
 	}
+	Term.Progress(0, 0)
 	return nil
 }
