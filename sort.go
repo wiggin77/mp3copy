@@ -49,11 +49,10 @@ func SortEntries(entries []Entry, sorters []Sorter) {
 			prev = val
 			continue
 		}
-
 		if val == prev {
 			if !found {
 				found = true
-				start = i
+				start = i - 1
 			}
 		} else {
 			if found {
