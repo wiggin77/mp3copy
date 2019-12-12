@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
+	"io/ioutil"
 	"strings"
 )
 
@@ -14,7 +14,7 @@ const (
 )
 
 var (
-	Term = &Terminal{sb: strings.Builder{}}
+	Term = &Terminal{sb: strings.Builder{}, out: ioutil.Discard, err: ioutil.Discard}
 )
 
 // Terminal provides a simple way to write to the terminal, providing
@@ -22,14 +22,30 @@ var (
 type Terminal struct {
 	progress float32 // percent complete
 	sb       strings.Builder
+	out      io.Writer
+	err      io.Writer
+}
+
+func (t *Terminal) SetOut(w io.Writer) {
+	if w == nil {
+		w = ioutil.Discard
+	}
+	t.out = w
+}
+
+func (t *Terminal) SetErr(w io.Writer) {
+	if w == nil {
+		w = ioutil.Discard
+	}
+	t.err = w
 }
 
 func (t *Terminal) Printf(format string, a ...interface{}) {
-	t.printf(os.Stdout, format, a...)
+	t.printf(t.out, format, a...)
 }
 
 func (t *Terminal) Errorf(format string, a ...interface{}) {
-	t.printf(os.Stderr, format, a...)
+	t.printf(t.err, format, a...)
 }
 
 func (t *Terminal) Progress(current int64, total int64) {
@@ -43,12 +59,12 @@ func (t *Terminal) Progress(current int64, total int64) {
 
 func (t *Terminal) printf(w io.Writer, format string, a ...interface{}) {
 	t.clearLine()
-	fmt.Fprintf(os.Stdout, format, a...)
+	fmt.Fprintf(t.out, format, a...)
 	t.displayProgress()
 }
 
 func (t *Terminal) clearLine() {
-	fmt.Fprintf(os.Stdout, "\033[2K\r")
+	fmt.Fprintf(t.out, "\033[2K\r")
 }
 
 func (t *Terminal) displayProgress() {
@@ -56,6 +72,6 @@ func (t *Terminal) displayProgress() {
 	if prog > 0 {
 		bar := PROGRESS_BAR[:prog]
 		space := PROGRESS_SPACE[:PROGRESS_BAR_LEN-prog]
-		fmt.Fprintf(os.Stdout, "\r[%s%s] %.1f%%  ", bar, space, t.progress*100)
+		fmt.Fprintf(t.out, "\r[%s%s] %.1f%%  ", bar, space, t.progress*100)
 	}
 }

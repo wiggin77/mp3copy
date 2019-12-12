@@ -41,7 +41,7 @@ func copyDir(opts Opts, dir string) error {
 	dest := filepath.Join(opts.dest, reldir)
 
 	// mkdir this directory in the dest
-	if reldir != "." {
+	if !opts.simulation && reldir != "." {
 		if err := os.MkdirAll(dest, dirInfo.Mode().Perm()); err != nil {
 			return err
 		}
@@ -100,7 +100,7 @@ func copyFiles(opts Opts, entries []Entry) error {
 			return err
 		}
 		dest := filepath.Join(opts.dest, reldir)
-		err = copyFile(entry, dest, buf)
+		err = copyFile(opts, entry, dest, buf)
 		if err != nil {
 			Term.Errorf("%v", err)
 		}
@@ -108,18 +108,21 @@ func copyFiles(opts Opts, entries []Entry) error {
 	return nil
 }
 
-func copyFile(entry Entry, dest string, buf []byte) error {
+func copyFile(opts Opts, entry Entry, dest string, buf []byte) error {
 	srcFile, err := os.Open(entry.filespec)
 	if err != nil {
 		return fmt.Errorf("cannot open %s: %v", entry.filespec, err)
 	}
 	defer srcFile.Close()
 
-	destFile, err := os.OpenFile(dest, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, entry.mode)
-	if err != nil {
-		return fmt.Errorf("cannot create %s: %v", dest, err)
+	var destFile *os.File
+	if !opts.simulation {
+		destFile, err = os.OpenFile(dest, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, entry.mode)
+		if err != nil {
+			return fmt.Errorf("cannot create %s: %v", dest, err)
+		}
+		defer destFile.Close()
 	}
-	defer destFile.Close()
 
 	Term.Printf("%s\n", entry.filespec)
 
@@ -134,8 +137,10 @@ func copyFile(entry Entry, dest string, buf []byte) error {
 			break
 		}
 
-		if n, err = destFile.Write(buf[:n]); err != nil {
-			return err
+		if !opts.simulation {
+			if n, err = destFile.Write(buf[:n]); err != nil {
+				return err
+			}
 		}
 		count = count + int64(n)
 		Term.Progress(count, entry.size)
