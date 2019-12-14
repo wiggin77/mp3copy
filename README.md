@@ -2,7 +2,7 @@
 
 Music players supporting USB drives and SD cards often only support the FAT file system and play media in the order files were written to the drive.
 
-This utility copies music files (MP3, ACC, M4A, ALAC, OGG, FLAC) and can sort by:
+This utility copies music files (MP3, AAC, M4A, ALAC, OGG, FLAC) and can sort by:
 
 | option | description             |
 | ------ | -----------             |
