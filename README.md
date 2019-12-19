@@ -49,7 +49,7 @@ This example copies all music files (and artwork, etc) from src to dest.
 ./mp3copy -src=~/Music -dest=/media/usb_stick -sort=artist:a,album:a,track:a,file:a
 ```
 
-The sort order defaults to ascending 'a' and can be ommited.
+The sort order defaults to ascending 'a' and can be omitted.
 
 ```bash
 ./mp3copy -src=~/Music -dest=/media/usb_stick -sort=artist,album,track,file
