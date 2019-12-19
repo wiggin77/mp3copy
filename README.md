@@ -5,7 +5,7 @@
 
 Music players supporting USB drives and SD cards often only support the FAT file system and play media in the order files were written to the drive.
 
-This utility copies music files (MP3, AAC, M4A, ALAC, OGG, FLAC) and can sort by:
+This utility copies music files in the correct order (MP3, AAC, M4A, ALAC, OGG, FLAC) and can sort by:
 
 | option | description             |
 | ------ | -----------             |
@@ -28,7 +28,7 @@ Sort order is determined by (in order of precedence):
 
 ## .mp3copy
 
-Place this file in any directories to control the sort order.
+Place a `.mp3copy` file in any directories to control the sort order.
 
 ```bash
 # Comma separated list of sort criteria in order of precedence.
@@ -46,5 +46,11 @@ children = true
 This example copies all music files (and artwork, etc) from src to dest.
 
 ```bash
-./mp3copy -src=~/Music -dest=/media/usb_stick -sort=artist:a,album:a,track:a
+./mp3copy -src=~/Music -dest=/media/usb_stick -sort=artist:a,album:a,track:a,file:a
+```
+
+The sort order defaults to ascending 'a' and can be ommited.
+
+```bash
+./mp3copy -src=~/Music -dest=/media/usb_stick -sort=artist,album,track,file
 ```
